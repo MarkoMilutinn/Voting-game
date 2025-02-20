@@ -1,10 +1,10 @@
-const API_URL = "http://localhost:5000/api/joke";
+const API_URL = "http://localhost:5000/api";
 
-// Fetch the joke from the backend
+// Fetch a joke from the backend
 export async function fetchJoke() {
   try {
-    const response = await fetch(API_URL);
-    
+    const response = await fetch(`${API_URL}/joke`); // Ensure correct path
+
     if (!response.ok) throw new Error("Failed to fetch joke");
 
     const joke = await response.json();
@@ -13,18 +13,17 @@ export async function fetchJoke() {
       throw new Error("Joke data is incomplete");
     }
 
-    return joke; // Return the joke from the backend
+    return joke; // ✅ Return the joke from the backend
   } catch (error) {
     console.error("Error fetching joke:", error);
     throw new Error("Failed to fetch joke");
   }
 }
 
-
 // Submit a vote for a joke
 export async function voteForJoke(jokeId, emoji) {
   try {
-    const response = await fetch(`${API_URL}/${jokeId}/vote`, {
+    const response = await fetch(`${API_URL}/joke/${jokeId}/vote`, { // ✅ Ensure correct URL structure
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ emoji }),
@@ -33,7 +32,7 @@ export async function voteForJoke(jokeId, emoji) {
     if (!response.ok) throw new Error("Failed to submit vote");
 
     const updatedJoke = await response.json();
-    return updatedJoke; // Return the updated joke with new vote counts
+    return updatedJoke; // ✅ Return the updated joke with new vote counts
   } catch (error) {
     console.error("Error submitting vote:", error);
     throw new Error("Failed to submit vote");

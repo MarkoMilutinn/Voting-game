@@ -1,23 +1,36 @@
 import { useState, useEffect } from "react";
 import PropTypes from "prop-types";
+import { voteForJoke } from "../api"; // ✅ Import API function
 
 function EmojiVoting({ jokeId }) {
   const [votes, setVotes] = useState({ "😂": 0, "👍": 0, "❤️": 0 });
   const [userVotes, setUserVotes] = useState({ "😂": false, "👍": false, "❤️": false });
 
+  // ✅ Fetch votes from backend when joke changes
   useEffect(() => {
-    // Reset votes when the joke changes
-    setVotes({ "😂": 0, "👍": 0, "❤️": 0 });
-    setUserVotes({ "😂": false, "👍": false, "❤️": false });
+    async function fetchVotes() {
+      try {
+        const response = await fetch('http://localhost:5000/api/joke/${jokeId}');
+        if (!response.ok) throw new Error("Failed to fetch votes");
+        const jokeData = await response.json();
+        
+        setVotes(jokeData.votes || { "😂": 0, "👍": 0, "❤️": 0 }); // ✅ Update votes
+        setUserVotes({ "😂": false, "👍": false, "❤️": false }); // ✅ Reset user votes
+      } catch (error) {
+        console.error("Error fetching votes:", error);
+      }
+    }
+    if (jokeId) fetchVotes();
   }, [jokeId]);
 
-  const handleVote = (emoji) => {
-    const isRemovingVote = userVotes[emoji]; // Check if user is removing vote
-    const change = isRemovingVote ? -1 : 1; // +1 if voting, -1 if removing
-
-    // Update votes and toggle user selection
-    setVotes((prevVotes) => ({ ...prevVotes, [emoji]: Math.max(0, prevVotes[emoji] + change) }));
-    setUserVotes((prevUserVotes) => ({ ...prevUserVotes, [emoji]: !isRemovingVote }));
+  // ✅ Handle vote submission
+  const handleVote = async (emoji) => {
+    try {
+      const updatedJoke = await voteForJoke(jokeId, emoji); // ✅ Send vote to backend
+      setVotes(updatedJoke.votes); // ✅ Update UI with new vote count
+    } catch (error) {
+      console.error("Error submitting vote:", error);
+    }
   };
 
   return (
@@ -35,7 +48,7 @@ function EmojiVoting({ jokeId }) {
             borderRadius: "5px",
           }}
         >
-          {emoji} {votes[emoji]}
+          {emoji} {votes[emoji] || 0} {/* ✅ Display real votes */}
         </button>
       ))}
     </div>

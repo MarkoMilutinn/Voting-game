@@ -10,67 +10,48 @@ const router = express.Router();
  */
 async function saveJokeToDB(jokeData) {
   try {
-    // Validate joke data to ensure it has all required fields
+    // Debugging
+    console.log("Received jokeData:", jokeData);
+
+    // Validate joke data
     if (!jokeData.id || jokeData.id.trim() === "" || !jokeData.question || !jokeData.answer) {
-      console.error("Error: Invalid joke data received:", jokeData);
+      console.error("❌ Invalid joke data received:", jokeData);
       return null;
     }
 
-    // Log joke data to make sure jokeId is valid
-    console.log("Checking joke data:", jokeData);
+    // Double-check jokeId is valid
+    console.log("🆔 Checking joke ID:", jokeData.id);
 
-    // Check if the joke already exists in MongoDB by jokeId
+    // Check if joke already exists
     let joke = await Joke.findOne({ jokeId: jokeData.id });
 
-    // If joke already exists, log and return it
     if (joke) {
       console.log("🔄 Joke already exists:", joke.jokeId);
-      return joke; // Return the existing joke
+      return joke;
     }
 
-    // If joke does not exist, create a new one and save it
+    // Create new joke entry
     joke = new Joke({
-      jokeId: jokeData.id, // Ensure jokeId is correctly assigned
+      jokeId: jokeData.id, 
       question: jokeData.question,
       answer: jokeData.answer,
       votes: { "😂": 0, "👍": 0, "❤️": 0 },
     });
 
-    // Save the new joke to MongoDB
+    console.log("✅ Saving new joke:", joke);
+
+    // Save to MongoDB
     await joke.save();
-    console.log("✅ Joke saved:", joke.jokeId);
+    console.log("🎉 Successfully saved joke:", joke.jokeId);
     return joke;
   } catch (error) {
-    console.error("Error saving joke to DB:", error);
+    console.error("❌ Error saving joke to DB:", error);
     return null;
   }
 }
 
-// Fetch a joke from Teehee API and store in MongoDB (if new)
-// router.get("/joke", async (req, res) => {
-//   try {
-//     // Fetch joke from Teehee API
-//     const { data } = await axios.get("https://teehee.dev/api/joke");
 
-//     // Save the fetched joke to MongoDB
-//     const joke = await saveJokeToDB(data);
 
-//     // If saving failed, return a 500 error
-//     if (!joke) {
-//       return res.status(500).json({ error: "Failed to save joke" });
-//     }
-
-//     // Return the joke as JSON
-//     res.json(joke);
-//   } catch (error) {
-//     console.error("Error fetching joke:", error);
-//     res.status(500).json({ error: "Failed to fetch joke" });
-//   }
-// });
-
-// Vote for an emoji on a joke
-// Fetch a joke from Teehee API and store in MongoDB (if new)
-// Fetch a joke from Teehee API and store in MongoDB (if new)
 router.get("/joke", async (req, res) => {
   try {
     console.log("🔍 Fetching joke from Teehee API...");

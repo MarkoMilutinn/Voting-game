@@ -1,93 +1,42 @@
-// import  { useState, useEffect } from "react";
-// import { fetchJoke } from "../api"; // API call for fetching joke
-// import EmojiVoting from "./EmojiVoting"; // Voting component
-
-// function JokeDisplay() {
-//   const [joke, setJoke] = useState(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState(null);
-
-//   // Fetch joke from the backend
-//   useEffect(() => {
-//     async function loadJoke() {
-//       try {
-//         const joke = await fetchJoke(); // This calls your backend API
-//         setJoke(joke);
-//         setLoading(false);
-//       } catch (err) {
-//         console.error(err);
-//         setError("Failed to fetch joke");
-//         setLoading(false);
-//       }
-//     }
-//     loadJoke();
-//   }, []);
-
-//   // Handle error display
-//   if (loading) return <div>Loading...</div>;
-//   if (error) return <div>{error}</div>;
-
-//   return (
-//     <div>
-//       <h2>{joke.question}</h2>
-//       <p>{joke.answer}</p>
-//       <EmojiVoting jokeId={joke.jokeId} />
-//     </div>
-//   );
-// }
-
-// export default JokeDisplay;
-
-
-import  { useState, useEffect } from 'react';
-import EmojiVoting from './EmojiVoting'; // Emoji voting component
+import { useState, useEffect } from "react";
+import { fetchJoke } from "../api"; // ✅ Import API function
+import EmojiVoting from "./EmojiVoting"; // ✅ Import voting component
 
 function JokeDisplay() {
   const [joke, setJoke] = useState(null); // Holds the joke data
-  const [loading, setLoading] = useState(false); // Tracks loading state
+  const [loading, setLoading] = useState(true); // Tracks loading state
   const [error, setError] = useState(null); // Tracks error state
 
-  // Function to fetch a new joke
-  const fetchJoke = async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const response = await fetch('https://teehee.dev/api/joke');
-      if (!response.ok) throw new Error(`HTTP Error! Status: ${response.status}`);
-      
-      const data = await response.json();
-      console.log("Fetched joke data:", data); // For debugging
-      
-      // Check if joke data has both question and answer
-      if (data.question && data.answer) {
-        setJoke(data); // Set the joke
-      } else {
-        throw new Error('Invalid joke format');
-      }
-    } catch (err) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // Fetch a joke when the component mounts
+  // Fetch joke from backend
   useEffect(() => {
-    fetchJoke();
+    async function loadJoke() {
+      try {
+        const fetchedJoke = await fetchJoke(); // ✅ Fetch from backend
+        setJoke(fetchedJoke);
+      } catch (err) {
+        console.error(err);
+        setError("Failed to fetch joke");
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadJoke();
   }, []);
+
+  // Handle UI states
+  if (loading) return <p>Loading...</p>;
+  if (error) return <p>Error: {error}</p>;
 
   return (
     <div>
-      {loading && <p>Loading...</p>}
-      {error && <p>Error: {error}</p>}
       {joke && (
         <div>
           <p><strong>{joke.question}</strong></p>
           <p>{joke.answer}</p>
-          <EmojiVoting jokeId={joke.id} /> {/* Voting buttons for this joke */}
+          <EmojiVoting jokeId={joke.jokeId} /> {/* ✅ Pass correct jokeId */}
         </div>
       )}
-      <button onClick={fetchJoke}>Next Joke</button>
+      <button onClick={() => window.location.reload()}>Next Joke</button> {/* Refresh for new joke */}
     </div>
   );
 }
