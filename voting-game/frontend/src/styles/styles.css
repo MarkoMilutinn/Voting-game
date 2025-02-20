@@ -1,0 +1,30 @@
+.app {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    padding: 20px;
+  }
+  
+  .joke-container {
+    background: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    display: inline-block;
+  }
+  
+  .emoji-container {
+    margin-top: 10px;
+  }
+  
+  .emoji-button {
+    font-size: 20px;
+    margin: 5px;
+    padding: 10px;
+    cursor: pointer;
+  }
+  
+  .next-joke-button {
+    margin-top: 10px;
+    padding: 10px 20px;
+    cursor: pointer;
+  }
+  
